@@ -43,6 +43,11 @@ const routes: Array<RouteRecordRaw> = [
                         component: () => import("@/views/Admin/Home/Home.vue"),
                         children: [
                             {
+                                path: "file",
+                                name: "AdminFile",
+                                component: () => import("@/views/Admin/Home/File/File.vue")
+                            },
+                            {
                                 path: "permission",
                                 name: "AdminPermission",
                                 component: () => import("@/views/Admin/Home/Permission/Permission.vue")

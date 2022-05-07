@@ -3,21 +3,15 @@
     <div>
       <div class="flex items-center">
         <div class="flex items-center">
-          <div class="w-24">告警规则ID</div>
+          <div class="w-24">文件ID</div>
           <el-input />
         </div>
         <div class="flex items-center ml-4">
-          <div class="w-24">告警级别</div>
-          <el-select>
-            <el-option>全部文件</el-option>
-            <el-option>视频</el-option>
-            <el-option>音频</el-option>
-            <el-option>文件</el-option>
-            <el-option>其他</el-option>
-          </el-select>
+          <div class="w-24">文件名称</div>
+          <el-input />
         </div>
         <div class="flex items-center ml-4">
-          <div class="w-24">告警模板</div>
+          <div class="w-24">文件类型</div>
           <el-select>
             <el-option>全部文件</el-option>
             <el-option>视频</el-option>
@@ -37,14 +31,15 @@
     <el-divider />
     <div>
       <el-table>
-        <el-table-column label="告警规则ID" />
-        <el-table-column label="告警级别" />
-        <el-table-column label="告警次数" />
-        <el-table-column label="告警模板ID" />
+        <el-table-column label="文件ID" />
+        <el-table-column label="文件名称" />
+        <el-table-column label="文件大小" />
+        <el-table-column label="文件上传时间" />
+        <el-table-column label="文件哈希值" />
+        <el-table-column label="文件类型" />
         <el-table-column label="操作">
           <template>
             <el-button>查看</el-button>
-            <el-button>删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -54,3 +49,7 @@
     </div>
   </div>
 </template>
+
+<script lang="ts" setup>
+
+</script>

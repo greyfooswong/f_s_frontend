@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 export const useAdminStore = defineStore({
     id: "admin",
     state: () => ({
-        type: "permission",
+        type: "file",
         isLogin: false
     }),
     getters: {
@@ -13,7 +13,7 @@ export const useAdminStore = defineStore({
         login(){
             return new Promise(resolve => {
                 this.isLogin = true;
-                this.type = "permission";
+                this.type = "file";
                 window.sessionStorage.setItem("adminIsLogin", "true");
                 resolve(true);
             });

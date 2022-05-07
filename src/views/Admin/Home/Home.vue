@@ -11,6 +11,9 @@
               class="h-full"
               @select="selectMenu"
           >
+            <el-menu-item index="file">
+              <span>文件管理</span>
+            </el-menu-item>
             <el-menu-item index="permission">
               <span>权限管理</span>
             </el-menu-item>
