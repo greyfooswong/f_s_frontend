@@ -45,7 +45,7 @@ const login = async () => {
   await form.value!.validate(async (valid) => {
     if (valid) {
       await store.login();
-      await router.push("/admin/permission");
+      await router.push("/admin/file");
     } else {
       ElMessage.error("username or password was required!");
     }

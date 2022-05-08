@@ -30,16 +30,16 @@
     </div>
     <el-divider />
     <div>
-      <el-table>
-        <el-table-column label="文件ID" />
-        <el-table-column label="文件名称" />
-        <el-table-column label="文件大小" />
-        <el-table-column label="文件上传时间" />
-        <el-table-column label="文件哈希值" />
-        <el-table-column label="文件类型" />
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="id" label="文件ID" />
+        <el-table-column prop="fileName" label="文件名称" />
+        <el-table-column prop="size" label="文件大小" />
+        <el-table-column prop="uploadTime" label="文件上传时间" />
+        <el-table-column prop="hash" label="文件哈希值" />
+        <el-table-column prop="type" label="文件类型" />
         <el-table-column label="操作">
-          <template>
-            <el-button>查看</el-button>
+          <template #default>
+            <el-button type="primary" @click="visible = true">查看</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -47,9 +47,75 @@
         <el-pagination background layout="prev, pager, next" :total="1000" />
       </div>
     </div>
+    <el-dialog v-model="visible">
+      <el-form :model="form">
+        <el-form-item label="文件ID" label-width="140px">
+          {{ form.id }}
+        </el-form-item>
+        <el-form-item label="用户ID" label-width="140px">
+          {{ form.userId }}
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="visible = false">保存</el-button>
+          <el-button type="primary" @click="visible = false">返回</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { ref } from "vue";
 
+const tableData = ref([
+  {
+    id: 0,
+    fileName: "管ghsff理员",
+    size: "102M",
+    uploadTime: "2019-12-12 12:30",
+    hash: "XXXXXX",
+    type: "视频",
+  },
+  {
+    id: 1,
+    fileName: "rqwerq",
+    size: "102M",
+    uploadTime: "2019-12-12 12:30",
+    hash: "XXXXXX",
+    type: "文件",
+  },
+  {
+    id: 2,
+    fileName: "fadsfqwe",
+    size: "102M",
+    uploadTime: "2019-12-12 12:30",
+    hash: "XXXXXX",
+    type: "音频",
+  },
+  {
+    id: 3,
+    fileName: "管fdsarewq理员",
+    size: "102M",
+    uploadTime: "2019-12-12 12:30",
+    hash: "XXXXXX",
+    type: "其他",
+  },
+  {
+    id: 4,
+    fileName: "fdsafs",
+    size: "102M",
+    uploadTime: "2019-12-12 12:30",
+    hash: "XXXXXX",
+    type: "视频",
+  }
+]);
+
+const visible = ref(false);
+
+const form = ref({
+  id: 1,
+  userId: 123
+});
 </script>

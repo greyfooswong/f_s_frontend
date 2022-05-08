@@ -26,15 +26,15 @@
     </div>
     <el-divider />
     <div>
-      <el-table>
-        <el-table-column label="日志ID" />
-        <el-table-column label="日志级别" />
-        <el-table-column label="日志内容" />
-        <el-table-column label="日志来源" />
-        <el-table-column label="日志时间" />
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column prop="id" label="日志ID" />
+        <el-table-column prop="level" label="日志级别" />
+        <el-table-column prop="message" label="日志内容" />
+        <el-table-column prop="source" label="日志来源" />
+        <el-table-column prop="time" label="日志时间" />
         <el-table-column label="操作">
-          <template>
-            <el-button>查看</el-button>
+          <template #default>
+            <el-button type="primary" @click="visible = true">查看</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -42,5 +42,70 @@
         <el-pagination background layout="prev, pager, next" :total="1000" />
       </div>
     </div>
+    <el-dialog v-model="visible">
+      <el-form :model="form">
+        <el-form-item label="告警规则ID" label-width="140px">
+          {{ form.id }}
+        </el-form-item>
+        <el-form-item label="告警级别" label-width="140px">
+          {{ form.message }}
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="visible = false">保存</el-button>
+          <el-button type="primary" @click="visible = false">返回</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
+
+<script lang="ts" setup>
+import { ref } from "vue";
+
+const tableData = ref([
+  {
+    id: 0,
+    level: "1级",
+    message: "log err:sss",
+    source: 129,
+    time: "2018.1.1"
+  },
+  {
+    id: 1,
+    level: "1级",
+    message: "log err:sss",
+    source: 129,
+    time: "2018.1.2"
+  },
+  {
+    id: 2,
+    level: "0级",
+    message: "log err:sss",
+    source: "ft",
+    time: "2018.2.1"
+  },
+  {
+    id: 3,
+    level: "4级",
+    message: "log err:sss",
+    source: "f_s",
+    time: "2018.2.3"
+  },
+  {
+    id: 4,
+    level: "3级",
+    message: "log err:sss",
+    source: "f_s",
+    time: "2018.3.1"
+  }
+]);
+
+const visible = ref(false);
+
+const form = ref({
+  id: 1,
+  message: "log err:sss",
+});
+</script>
