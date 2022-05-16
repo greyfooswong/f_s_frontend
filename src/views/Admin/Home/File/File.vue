@@ -4,15 +4,15 @@
       <div class="flex items-center">
         <div class="flex items-center">
           <div class="w-24">文件ID</div>
-          <el-input />
+          <el-input v-model="id" />
         </div>
         <div class="flex items-center ml-4">
           <div class="w-24">文件名称</div>
-          <el-input />
+          <el-input v-model="name" />
         </div>
         <div class="flex items-center ml-4">
           <div class="w-24">文件类型</div>
-          <el-select>
+          <el-select v-model="type">
             <el-option>全部文件</el-option>
             <el-option>视频</el-option>
             <el-option>音频</el-option>
@@ -23,14 +23,14 @@
       </div>
       <div class="mt-4">
         <el-space>
-          <el-button>查询</el-button>
+          <el-button type="primary">查询</el-button>
           <el-button>重置</el-button>
         </el-space>
       </div>
     </div>
     <el-divider />
     <div>
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="files" style="width: 100%">
         <el-table-column prop="id" label="文件ID" />
         <el-table-column prop="fileName" label="文件名称" />
         <el-table-column prop="size" label="文件大小" />
@@ -67,9 +67,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { getFiles as getFilesApi } from "@/utils";
 
-const tableData = ref([
+const files = ref([
   {
     id: 0,
     fileName: "管ghsff理员",
@@ -111,11 +112,22 @@ const tableData = ref([
     type: "视频",
   }
 ]);
-
 const visible = ref(false);
+
+const id = ref("");
+const name = ref("");
+const type = ref("");
 
 const form = ref({
   id: 1,
   userId: 123
 });
+
+const getFiles = async () => {
+  let response = await getFilesApi();
+}
+
+onMounted(() => {
+
+})
 </script>

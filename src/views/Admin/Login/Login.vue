@@ -44,7 +44,8 @@ const login = async () => {
   if (!form) return
   await form.value!.validate(async (valid) => {
     if (valid) {
-      await store.login();
+      await store.login({username: user.username, password: user.password});
+      ElMessage.success("登录成功!");
       await router.push("/admin/file");
     } else {
       ElMessage.error("username or password was required!");
