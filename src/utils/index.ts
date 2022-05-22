@@ -1,5 +1,6 @@
 import {Response, User, GetFileParams, DownloadParams} from "@/types";
 import {http} from "@/plugins";
+import moment from "moment";
 
 export * from "./api";
 export * from "./adminApi";
@@ -14,9 +15,12 @@ export const switchType = (type: number) => {
             text = "音频";
             break;
         case 3:
-            text = "文件";
+            text = "图片";
             break;
         case 4:
+            text = "文件";
+            break;
+        case 5:
             text = "其他";
             break;
         default:
@@ -24,6 +28,10 @@ export const switchType = (type: number) => {
             break;
     }
     return text;
+}
+
+export const formatTime = (time: number) => {
+    return moment(time).format("YYYY-MM-DD HH:mm:ss");
 }
 
 export const instance = (data: Response) => {

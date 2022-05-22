@@ -30,7 +30,11 @@
         <el-table-column prop="id" label="文件ID" width="120px" />
         <el-table-column prop="file_name" label="文件名称" />
         <el-table-column prop="file_size" label="文件大小" />
-        <el-table-column prop="modified_on" label="文件上传时间" />
+        <el-table-column prop="modified_on" label="文件上传时间">
+          <template #default="{ row }">
+            {{ formatTime(row.modified_on) }}
+          </template>
+        </el-table-column>
         <el-table-column prop="file_sha1" label="文件哈希值" width="400px" />
         <el-table-column prop="file_type" label="文件类型">
           <template #default="scope">
@@ -68,29 +72,29 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, computed } from "vue";
-import { getUserFile as getUserFilesApi, switchType } from "@/utils";
+import { formatTime, getUserFile as getUserFilesApi, switchType } from "@/utils";
 import { Files } from "@/types";
 
 const options = [
   {
-    label: "全部文件",
-    value: "全部文件"
-  },
-  {
     label: "视频",
-    value: "视频"
+    value: 1
   },
   {
     label: "音频",
-    value: "音频"
+    value: 2
+  },
+  {
+    label: "图片",
+    value: 3
   },
   {
     label: "文件",
-    value: "文件"
+    value: 4
   },
   {
     label: "其他",
-    value: "其他"
+    value: 5
   },
 ]
 
@@ -123,7 +127,7 @@ const search = () => {
 }
 
 const getFiles = async () => {
-  let response = await getUserFilesApi({ page: String(pageNumber.value), page_size: String(pageSize.value), id: id.value, file_name: name.value, file_type: type.value });
+  let response = await getUserFilesApi({ page: String(pageNumber.value), page_size: String(pageSize.value), id: id.value.toString(), file_name: name.value, file_type: type.value.toString() });
   files.value = response.list;
   total.value = response.pager.total_rows;
   pageNumber.value = response.pager.page;

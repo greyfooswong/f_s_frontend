@@ -21,9 +21,12 @@
               <span>音频</span>
             </el-menu-item>
             <el-menu-item index="3">
-              <span>文件</span>
+              <span>图片</span>
             </el-menu-item>
             <el-menu-item index="4">
+              <span>文件</span>
+            </el-menu-item>
+            <el-menu-item index="5">
               <span>其他</span>
             </el-menu-item>
           </el-menu>
@@ -70,9 +73,12 @@ const switchType = (index: string) => {
       text = "audio";
       break;
     case "3":
-      text = "file";
+      text = "image";
       break;
     case "4":
+      text = "file";
+      break;
+    case "5":
       text = "other";
       break;
     default:

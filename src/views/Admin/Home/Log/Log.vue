@@ -31,7 +31,11 @@
         </el-table-column>
         <el-table-column prop="log_message" label="日志内容" show-overflow-tooltip />
         <el-table-column prop="log_from" label="日志来源" show-overflow-tooltip />
-        <el-table-column prop="modified_by" label="日志时间" />
+        <el-table-column prop="modified_on" label="日志时间">
+          <template #default="{ row }">
+            {{ formatTime(row.modified_on) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作">
           <template #default="{ row }">
             <el-button type="primary" @click="show(row.id, row.log_message)">查看</el-button>
@@ -62,7 +66,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { getLogs as getLogsApi } from "@/utils";
+import { formatTime, getLogs as getLogsApi } from "@/utils";
 import type { Log } from "@/types";
 
 const options = [

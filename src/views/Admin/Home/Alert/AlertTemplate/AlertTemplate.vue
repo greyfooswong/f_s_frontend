@@ -30,7 +30,11 @@
           </template>
         </el-table-column>
         <el-table-column prop="message" label="告警模板内容" show-overflow-tooltip />
-        <el-table-column prop="modified_on" label="告警模板时间" />
+        <el-table-column prop="modified_on" label="告警模板时间">
+          <template #default="{ row }">
+            {{ formatTime(row.modified_on) }}
+          </template>
+        </el-table-column>
         <el-table-column label="操作">
           <template #default="{ row }">
             <el-button type="primary" @click="show(row.id, row.alarm_level, row.message)">编辑</el-button>
@@ -68,7 +72,7 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { getAlertTemplate as getAlertTemplateApi, deleteAlertTemplate as deleteAlertTemplateApi, updateAlertTemplate as updateAlertTemplateApi } from "@/utils";
+import { formatTime, getAlertTemplate as getAlertTemplateApi, deleteAlertTemplate as deleteAlertTemplateApi, updateAlertTemplate as updateAlertTemplateApi } from "@/utils";
 import type { AlertTemplate } from "@/types";
 import {ElMessage} from "element-plus";
 
