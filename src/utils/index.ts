@@ -50,7 +50,10 @@ export const login = (data: User) => {
     return instance({
         url: "/login",
         method: "POST",
-        data: data
+        data: {
+            "user_name":data.username,
+            "user_password":data.password,
+        }
     })
 }
 
