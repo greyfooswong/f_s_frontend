@@ -19,7 +19,7 @@ export const useAdminStore = defineStore({
             return new Promise((resolve, reject) => {
                 login(user).then(res => {
                     console.log(res);
-                    // if(res.user_permission_id != 1){
+                    if(res.user_permission_id != 1){
                         auth().then(response => {
                             _this.user = res;
                             _this.isLogin = true;
@@ -30,10 +30,10 @@ export const useAdminStore = defineStore({
                         }).catch(() => {
                             reject(false);
                         });
-                    // }else{
-                    //     ElMessage.error("非管理员用户无法登录");
-                    //     reject(false);
-                    // }
+                    }else{
+                        ElMessage.error("非管理员用户无法登录");
+                        reject(false);
+                    }
                 }).catch(() => {
                     reject(false);
                 });
