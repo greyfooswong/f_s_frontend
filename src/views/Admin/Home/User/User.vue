@@ -24,7 +24,7 @@
         <el-table-column prop="phone" label="用户电话" />
         <el-table-column label="操作">
           <template #default="{ row }">
-            <el-button type="primary" @click="show(row.id, row.user_name, row.user_password, row.email, row.phone)">查看</el-button>
+            <el-button type="primary" @click="show(row.id, row.user_name, row.user_password, row.email, row.phone, row.user_permission_id)">查看</el-button>
             <el-button type="danger" @click="del(row.id)">删除</el-button>
           </template>
         </el-table-column>
@@ -40,6 +40,11 @@
         </el-form-item>
         <el-form-item label="用户名" label-width="140px">
           {{ form.username }}
+        </el-form-item>
+        <el-form-item label="权限" label-width="140px">
+          <el-select v-model="form.user_permission_id">
+            <el-option v-for="(item, index) in permissionList" :key="index" :label="item.permission_name" :value="item.id" />
+          </el-select>
         </el-form-item>
         <el-form-item label="用户密码" label-width="140px">
           <el-input v-model="form.password" />
@@ -63,11 +68,12 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-import { getUsers as getUsersApi, deleteUser as deleteUserApi, updateUser as updateUserApi } from "@/utils";
-import type { User } from "@/types";
+import { getUsers as getUsersApi, deleteUser as deleteUserApi, updateUser as updateUserApi, getPermissionList as getPermissionListApi } from "@/utils";
+import type { User, Permission } from "@/types";
 import {ElMessage} from "element-plus";
 
 const list = ref<Array<User>>([]);
+const permissionList = ref<Array<Permission>>([]);
 const pageNumber = ref<number>(0);
 const pageSize = ref<number>(10);
 const total = ref<number>(0);
@@ -80,7 +86,8 @@ const form = ref({
   username: "98k",
   password: "1234",
   mail: "123@qq.com",
-  phone: "12345678911"
+  phone: "12345678911",
+  user_permission_id: 0,
 });
 
 const getList = async () => {
@@ -89,6 +96,11 @@ const getList = async () => {
   total.value = response.pager.total_rows;
   pageNumber.value = response.pager.page;
   pageSize.value = response.pager.page_size;
+}
+
+const getPermission = async () => {
+  let response = await getPermissionListApi({ page: "1", page_size: "1000000" });
+  permissionList.value = response.list;
 }
 
 const change = (page: number) => {
@@ -105,13 +117,14 @@ const search = () => {
   getList();
 }
 
-const show = (id: number, username: string, password: string, mail: string, phone: string) => {
+const show = (id: number, username: string, password: string, mail: string, phone: string, user_permission_id: number) => {
   form.value = {
     id,
     username,
     password,
     mail,
-    phone
+    phone,
+    user_permission_id
   }
   visible.value = true;
 }
@@ -131,5 +144,6 @@ const update = async () => {
 
 onMounted(() => {
   getList();
+  getPermission();
 });
 </script>
