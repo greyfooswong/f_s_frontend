@@ -31,7 +31,15 @@ export const switchType = (type: number) => {
 }
 
 export const formatTime = (time: number) => {
-    return moment(time).format("YYYY-MM-DD HH:mm:ss");
+    let date = time;
+    if(time.toString().length === 10){
+        date = time * 1000
+    }
+    if(time){
+        return moment(date).format("YYYY-MM-DD HH:mm:ss");
+    }else{
+        return "";
+    }
 }
 
 export const instance = (data: Response) => {

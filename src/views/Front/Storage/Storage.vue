@@ -11,7 +11,11 @@
     <el-table :data="files" style="width: 100%">
       <el-table-column prop="file_name" label="文件名" />
       <el-table-column prop="file_size" label="大小" width="180" />
-      <el-table-column prop="modified_on" label="修改时间" width="250" />
+      <el-table-column prop="modified_on" label="修改时间" width="250">
+        <template #default="{ row }">
+          {{ formatTime(row.modified_on) }}
+        </template>
+      </el-table-column>
       <el-table-column label="操作" width="250">
         <template #default="scoped">
           <el-space>
@@ -31,7 +35,7 @@ import { useStore } from "@/store";
 import { storeToRefs } from "pinia";
 import { Search } from "@element-plus/icons-vue";
 import PageHead from "@/components/PageHead.vue";
-import {download as downloadApi, deleteFile as deleteFileApi, uploadFile} from "@/utils";
+import {formatTime, deleteFile as deleteFileApi, uploadFile} from "@/utils";
 import {ElMessage} from "element-plus";
 
 const route = useRoute();
