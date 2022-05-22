@@ -136,7 +136,7 @@ const del = async (id: number) => {
 }
 
 const update = async () => {
- await updateUserApi({ id: form.value.id.toString(), email: form.value.mail.toString(), phone: form.value.phone.toString(), user_name: form.value.username.toString(), user_password: form.value.password.toString() });
+ await updateUserApi({ id: form.value.id.toString(), email: form.value.mail.toString(), phone: form.value.phone.toString(), user_name: form.value.username.toString(), user_password: form.value.password.toString(), user_permission_id: form.value.user_permission_id.toString() });
  ElMessage.success("更新成功");
  await getList();
  visible.value = false;

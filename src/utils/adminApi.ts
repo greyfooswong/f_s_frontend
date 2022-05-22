@@ -80,7 +80,7 @@ export const deleteUser = (id: string) => {
     })
 }
 
-export const updateUser = (data: { id: string, user_name: string, user_password: string, email: string, phone: string }) => {
+export const updateUser = (data: { id: string, user_name: string, user_password: string, email: string, phone: string, user_permission_id: string }) => {
     return instance({
         url: "/api/v1/updateUser",
         method: "POST",
