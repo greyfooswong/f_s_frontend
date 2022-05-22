@@ -4,42 +4,42 @@
       <div class="flex items-center">
         <div class="flex items-center">
           <div class="w-24">告警模板ID</div>
-          <el-input />
+          <el-input v-model="id" />
         </div>
         <div class="flex items-center ml-4">
           <div class="w-24">告警级别</div>
-          <el-select>
-            <el-option>全部文件</el-option>
-            <el-option>视频</el-option>
-            <el-option>音频</el-option>
-            <el-option>文件</el-option>
-            <el-option>其他</el-option>
+          <el-select v-model="level">
+            <el-option v-for="(items, index) in options" :key="index" :label="items.label" :value="items.value" />
           </el-select>
         </div>
       </div>
       <div class="mt-4">
         <el-space>
-          <el-button>查询</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" @click="search">查询</el-button>
+          <el-button @click="reset">重置</el-button>
         </el-space>
       </div>
     </div>
     <el-divider />
     <div>
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="list" style="width: 100%">
         <el-table-column prop="id" label="告警模板ID" />
-        <el-table-column prop="level" label="告警级别" />
-        <el-table-column prop="template" label="告警模板内容" />
-        <el-table-column prop="templateId" label="告警模板ID" />
+        <el-table-column prop="alarm_level" label="告警级别">
+          <template #default="{ row }">
+            {{ types(row.alarm_level) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="message" label="告警模板内容" show-overflow-tooltip />
+        <el-table-column prop="modified_on" label="告警模板时间" />
         <el-table-column label="操作">
-          <template #default>
-            <el-button type="primary" @click="visible = true">编辑</el-button>
-            <el-button type="danger">删除</el-button>
+          <template #default="{ row }">
+            <el-button type="primary" @click="show(row.id, row.alarm_level, row.message)">编辑</el-button>
+            <el-button type="danger" @click="del(row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="mt-4 flex justify-center">
-        <el-pagination background layout="prev, pager, next" :total="1000" />
+        <el-pagination :current-page="pageNumber" @current-change="change" :page-size="pageSize" background layout="prev, pager, next" :total="total" />
       </div>
     </div>
     <el-dialog v-model="visible">
@@ -48,18 +48,17 @@
           {{ form.id }}
         </el-form-item>
         <el-form-item label="告警级别" label-width="140px">
-          <el-select v-model="form.level" placeholder="Please select a zone">
-            <el-option label="Zone No.1" value="shanghai" />
-            <el-option label="Zone No.2" value="beijing" />
+          <el-select v-model="form.level" placeholder="Please select a option">
+            <el-option v-for="(items, index) in options" :key="index" :label="items.label" :value="items.value" />
           </el-select>
         </el-form-item>
         <el-form-item label="告警内容" label-width="140px">
-          <el-input value="message" />
+          <el-input v-model="form.message" />
         </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="visible = false">保存</el-button>
+          <el-button @click="update">保存</el-button>
           <el-button type="primary" @click="visible = false">返回</el-button>
         </span>
       </template>
@@ -68,46 +67,112 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { getAlertTemplate as getAlertTemplateApi, deleteAlertTemplate as deleteAlertTemplateApi, updateAlertTemplate as updateAlertTemplateApi } from "@/utils";
+import type { AlertTemplate } from "@/types";
+import {ElMessage} from "element-plus";
 
-const tableData = ref([
+const options = [
   {
-    id: 0,
-    level: "1级",
-    template: "内容1",
-    templateId: 129,
+    label: "info",
+    value: 1
   },
   {
-    id: 1,
-    level: "1级",
-    template: "内容2",
-    templateId: 129,
+    label: "warning",
+    value: 2
   },
   {
-    id: 2,
-    level: "0级",
-    template: "内容3",
-    templateId: 129,
+    label: "debug",
+    value: 3
   },
   {
-    id: 3,
-    level: "4级",
-    template: "内容4",
-    templateId: 129,
+    label: "error",
+    value: 4
   },
-  {
-    id: 4,
-    level: "3级",
-    template: "内容5",
-    templateId: 129,
-  }
-]);
+]
 
+const list = ref<Array<AlertTemplate>>([]);
+const pageNumber = ref<number>(0);
+const pageSize = ref<number>(10);
+const total = ref<number>(0);
 const visible = ref(false);
+
+const id = ref("");
+const level = ref("");
+
+const types = (type: number) => {
+  let text = "";
+  switch(type){
+    case 1:
+      text = "info";
+      break;
+    case 2:
+      text = "warning";
+      break;
+    case 3:
+      text = "debug";
+      break;
+    case 4:
+      text = "error";
+      break;
+    default:
+      break;
+  }
+  return text;
+}
 
 const form = ref({
   id: 1,
-  level: "1级",
-  templateId: "129"
+  level: 1,
+  message: "",
+});
+
+const reset = () => {
+  id.value = "";
+  level.value = "";
+  getList();
+}
+
+const search = () => {
+  getList();
+}
+
+const change = (page: number) => {
+  pageNumber.value = page;
+  getList();
+}
+
+const getList = async () => {
+  let response = await getAlertTemplateApi({ page: pageNumber.value.toString(), page_size: pageSize.value.toString(), id: id.value.toString(), alarm_level: level.value.toString() })
+  list.value = response.list;
+  total.value = response.pager.total_rows;
+  pageNumber.value = response.pager.page;
+  pageSize.value = response.pager.page_size;
+}
+
+const show = (id: number, level: number, message: string) => {
+  form.value = {
+    id,
+    level,
+    message
+  }
+  visible.value = true;
+}
+
+const del = async (id: number) => {
+  await deleteAlertTemplateApi(id.toString());
+  ElMessage.success("删除成功");
+  await getList();
+}
+
+const update = async () => {
+  await updateAlertTemplateApi({ id: form.value.id.toString(), message: form.value.message.toString(), alarm_level: form.value.level.toString() });
+  ElMessage.success("更改成功");
+  await getList();
+  visible.value = false;
+}
+
+onMounted(() => {
+  getList();
 });
 </script>

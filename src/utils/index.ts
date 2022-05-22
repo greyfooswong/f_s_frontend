@@ -2,6 +2,29 @@ import {Response, User, GetFileParams, DownloadParams} from "@/types";
 import {http} from "@/plugins";
 
 export * from "./api";
+export * from "./adminApi";
+
+export const switchType = (type: number) => {
+    let text = "";
+    switch (type){
+        case 1:
+            text = "视频";
+            break;
+        case 2:
+            text = "音频";
+            break;
+        case 3:
+            text = "文件";
+            break;
+        case 4:
+            text = "其他";
+            break;
+        default:
+            text = "";
+            break;
+    }
+    return text;
+}
 
 export const instance = (data: Response) => {
     return new Promise<any>(resolve => {

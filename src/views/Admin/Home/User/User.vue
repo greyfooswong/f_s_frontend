@@ -4,43 +4,33 @@
       <div class="flex items-center">
         <div class="flex items-center">
           <div class="w-24">用户ID</div>
-          <el-input />
-        </div>
-        <div class="flex items-center ml-4">
-          <div class="w-24">用户权限</div>
-          <el-select>
-            <el-option>全部文件</el-option>
-            <el-option>视频</el-option>
-            <el-option>音频</el-option>
-            <el-option>文件</el-option>
-            <el-option>其他</el-option>
-          </el-select>
+          <el-input v-model="id" />
         </div>
       </div>
       <div class="mt-4">
         <el-space>
-          <el-button>查询</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" @click="search">查询</el-button>
+          <el-button @click="reset">重置</el-button>
         </el-space>
       </div>
     </div>
     <el-divider />
     <div>
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="list" style="width: 100%">
         <el-table-column prop="id" label="用户ID" />
-        <el-table-column prop="username" label="用户名" />
-        <el-table-column prop="permission" label="用户权限" />
-        <el-table-column prop="mail" label="用户邮箱" />
+        <el-table-column prop="user_name" label="用户名" />
+        <el-table-column prop="user_permission_name" label="用户权限" />
+        <el-table-column prop="email" label="用户邮箱" />
         <el-table-column prop="phone" label="用户电话" />
         <el-table-column label="操作">
-          <template #default>
-            <el-button type="primary" @click="visible = true">查看</el-button>
-            <el-button type="danger">删除</el-button>
+          <template #default="{ row }">
+            <el-button type="primary" @click="show(row.id, row.user_name, row.user_password, row.email, row.phone)">查看</el-button>
+            <el-button type="danger" @click="del(row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="mt-4 flex justify-center">
-        <el-pagination background layout="prev, pager, next" :total="1000" />
+        <el-pagination :current-page="pageNumber" @current-change="change" :page-size="pageSize" background layout="prev, pager, next" :total="total" />
       </div>
     </div>
     <el-dialog v-model="visible">
@@ -63,7 +53,7 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="visible = false">保存</el-button>
+          <el-button @click="update">保存</el-button>
           <el-button type="primary" @click="visible = false">返回</el-button>
         </span>
       </template>
@@ -72,47 +62,18 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { getUsers as getUsersApi, deleteUser as deleteUserApi, updateUser as updateUserApi } from "@/utils";
+import type { User } from "@/types";
+import {ElMessage} from "element-plus";
 
-const tableData = ref([
-  {
-    id: 0,
-    username: "98k",
-    permission: "管理员",
-    mail: "123@qq.com",
-    phone: "12345678911"
-  },
-  {
-    id: 1,
-    username: "222",
-    permission: "管理员",
-    mail: "123@qq.com",
-    phone: "12345678911"
-  },
-  {
-    id: 2,
-    username: "333",
-    permission: "管理员",
-    mail: "123@qq.com",
-    phone: "12345678911"
-  },
-  {
-    id: 3,
-    username: "98k2",
-    permission: "管理员",
-    mail: "123@qq.com",
-    phone: "12345678911"
-  },
-  {
-    id: 4,
-    username: "98k4",
-    permission: "管理员",
-    mail: "123@qq.com",
-    phone: "12345678911"
-  }
-]);
-
+const list = ref<Array<User>>([]);
+const pageNumber = ref<number>(0);
+const pageSize = ref<number>(10);
+const total = ref<number>(0);
 const visible = ref(false);
+
+const id = ref("");
 
 const form = ref({
   id: 1,
@@ -120,5 +81,55 @@ const form = ref({
   password: "1234",
   mail: "123@qq.com",
   phone: "12345678911"
+});
+
+const getList = async () => {
+  let response = await getUsersApi({ page: pageNumber.value.toString(), page_size: pageSize.value.toString(), id: id.value.toString()});
+  list.value = response.list;
+  total.value = response.pager.total_rows;
+  pageNumber.value = response.pager.page;
+  pageSize.value = response.pager.page_size;
+}
+
+const change = (page: number) => {
+  pageNumber.value = page;
+  getList();
+}
+
+const reset = () => {
+  id.value = "";
+  getList();
+}
+
+const search = () => {
+  getList();
+}
+
+const show = (id: number, username: string, password: string, mail: string, phone: string) => {
+  form.value = {
+    id,
+    username,
+    password,
+    mail,
+    phone
+  }
+  visible.value = true;
+}
+
+const del = async (id: number) => {
+  await deleteUserApi(id.toString())
+  ElMessage.success("删除成功");
+  await getList();
+}
+
+const update = async () => {
+ await updateUserApi({ id: form.value.id.toString(), email: form.value.mail.toString(), phone: form.value.phone.toString(), user_name: form.value.username.toString(), user_password: form.value.password.toString() });
+ ElMessage.success("更新成功");
+ await getList();
+ visible.value = false;
+}
+
+onMounted(() => {
+  getList();
 });
 </script>

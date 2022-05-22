@@ -4,6 +4,7 @@ import uri from "./neglectUri";
 
 export const http = axios.create({
     baseURL: import.meta.env.MODE === "development" ? "http://120.55.102.250:8000" : "",
+    // baseURL: import.meta.env.MODE === "development" ? "http://127.0.0.1:8000" : "",
     timeout: 60000,
     headers: {
         // "Content-Type": "application/x-www-form-urlencoded"

@@ -4,42 +4,42 @@
       <div class="flex items-center">
         <div class="flex items-center">
           <div class="w-24">日志ID</div>
-          <el-input />
+          <el-input v-model="id" />
         </div>
         <div class="flex items-center ml-4">
           <div class="w-24">日志级别</div>
-          <el-select>
-            <el-option>全部文件</el-option>
-            <el-option>视频</el-option>
-            <el-option>音频</el-option>
-            <el-option>文件</el-option>
-            <el-option>其他</el-option>
+          <el-select v-model="level">
+            <el-option v-for="(item, index) in options" :key="index" :label="item.label" :value="item.value" />
           </el-select>
         </div>
       </div>
       <div class="mt-4">
         <el-space>
-          <el-button>查询</el-button>
-          <el-button>重置</el-button>
+          <el-button type="primary" @click="search">查询</el-button>
+          <el-button @click="reset">重置</el-button>
         </el-space>
       </div>
     </div>
     <el-divider />
     <div>
-      <el-table :data="tableData" style="width: 100%">
+      <el-table :data="list" style="width: 100%">
         <el-table-column prop="id" label="日志ID" />
-        <el-table-column prop="level" label="日志级别" />
-        <el-table-column prop="message" label="日志内容" />
-        <el-table-column prop="source" label="日志来源" />
-        <el-table-column prop="time" label="日志时间" />
+        <el-table-column prop="log_level" label="日志级别">
+          <template #default="{ row }">
+            {{ types(row.log_level) }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="log_message" label="日志内容" show-overflow-tooltip />
+        <el-table-column prop="log_from" label="日志来源" show-overflow-tooltip />
+        <el-table-column prop="modified_by" label="日志时间" />
         <el-table-column label="操作">
-          <template #default>
-            <el-button type="primary" @click="visible = true">查看</el-button>
+          <template #default="{ row }">
+            <el-button type="primary" @click="show(row.id, row.log_message)">查看</el-button>
           </template>
         </el-table-column>
       </el-table>
       <div class="mt-4 flex justify-center">
-        <el-pagination background layout="prev, pager, next" :total="1000" />
+        <el-pagination :current-page="pageNumber" @current-change="change" :page-size="pageSize" background layout="prev, pager, next" :total="total" />
       </div>
     </div>
     <el-dialog v-model="visible">
@@ -53,7 +53,6 @@
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="visible = false">保存</el-button>
           <el-button type="primary" @click="visible = false">返回</el-button>
         </span>
       </template>
@@ -62,50 +61,100 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import { getLogs as getLogsApi } from "@/utils";
+import type { Log } from "@/types";
 
-const tableData = ref([
+const options = [
   {
-    id: 0,
-    level: "1级",
-    message: "log err:sss",
-    source: 129,
-    time: "2018.1.1"
+    label: "全部",
+    value: "全部"
   },
   {
-    id: 1,
-    level: "1级",
-    message: "log err:sss",
-    source: 129,
-    time: "2018.1.2"
+    label: "info",
+    value: "1"
   },
   {
-    id: 2,
-    level: "0级",
-    message: "log err:sss",
-    source: "ft",
-    time: "2018.2.1"
+    label: "warning",
+    value: "2"
   },
   {
-    id: 3,
-    level: "4级",
-    message: "log err:sss",
-    source: "f_s",
-    time: "2018.2.3"
+    label: "debug",
+    value: "3"
   },
   {
-    id: 4,
-    level: "3级",
-    message: "log err:sss",
-    source: "f_s",
-    time: "2018.3.1"
-  }
-]);
+    label: "error",
+    value: "4"
+  },
+]
 
+const list = ref<Array<Log>>([]);
+const pageNumber = ref<number>(0);
+const pageSize = ref<number>(10);
+const total = ref<number>(0);
 const visible = ref(false);
+
+const id = ref("");
+const level = ref("");
 
 const form = ref({
   id: 1,
   message: "log err:sss",
+});
+
+const types = (type: number) => {
+  let text = "";
+  switch(type){
+    case 1:
+      text = "info";
+      break;
+    case 2:
+      text = "warning";
+      break;
+    case 3:
+      text = "debug";
+      break;
+    case 4:
+      text = "error";
+      break;
+    default:
+      break;
+  }
+  return text;
+}
+
+const reset = () => {
+  id.value = "";
+  level.value = "";
+  getList();
+}
+
+const search = () => {
+  getList();
+}
+
+const change = (page: number) => {
+  pageNumber.value = page;
+  getList();
+}
+
+const getList = async () => {
+  let response = await getLogsApi({ page: pageNumber.value.toString(), page_size: pageSize.value.toString(), log_level: level.value.toString(), id: id.value.toString() });
+  list.value = response.list;
+  total.value = response.pager.total_rows;
+  pageNumber.value = response.pager.page;
+  pageSize.value = response.pager.page_size;
+}
+
+const show = (id: number, message: string) => {
+  form.value = {
+    id,
+    message
+  }
+  visible.value = true;
+}
+
+onMounted(() => {
+  getList();
 });
 </script>
